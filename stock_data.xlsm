@@ -1,0 +1,118 @@
+Sub stock_data()
+
+Dim i As Long
+Dim ws As Worksheet
+Dim LastRow As Long
+Dim count As Integer
+Dim open_value As Double
+Dim close_value As Double
+Dim percentchange As Double
+Dim ticker_total_value As Double
+Dim totalstockvolume As Double
+Dim greatest_increase_ticker As String
+Dim greatest_decrease_ticker As String
+Dim greatest_percent_increase As Double
+Dim greatest_percent_decrease As Double
+Dim greatest_volume_ticker As String
+Dim greatest_total_volume As Double
+
+
+
+For Each ws In Worksheets
+LastRow = ws.Cells(Rows.count, 1).End(xlUp).Row
+
+
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Quarterly Change "
+ws.Cells(1, 11).Value = "Percent Change"
+ws.Cells(1, 12).Value = "Total Stock Volume"
+ws.Cells(1, 16).Value = "Ticker"
+ws.Cells(1, 17).Value = "value"
+ws.Cells(2, 15).Value = "Greatest % increase"
+ws.Cells(3, 15).Value = "Greatest % decrease"
+ws.Cells(4, 15).Value = "Greatest total volume"
+
+
+count = 2
+open_value = ws.Cells(2, 3).Value
+ticker_total_value = 0
+
+greatest_percent_increase = 0
+greatest_percent_decrease = 0
+greatest_total_volume = 0
+
+
+For i = 2 To LastRow
+
+ticker_total_value = ticker_total_value + ws.Cells(i, 7).Value
+totalstockvolume = ticker_total_value
+
+If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+
+ws.Cells(count, 9).Value = ws.Cells(i, 1)
+
+close_value = ws.Cells(i, 6).Value
+
+ws.Cells(count, 10).Value = close_value - open_value
+
+If ws.Cells(count, 10).Value > 0 Then
+
+ws.Cells(count, 10).Interior.ColorIndex = 4
+
+ElseIf ws.Cells(count, 10).Value < 0 Then
+
+ws.Cells(count, 10).Interior.ColorIndex = 3
+
+End If
+
+
+percentchange = ((close_value - open_value) / open_value) * 100
+
+ws.Cells(count, 11).Value = Str(((close_value - open_value) / open_value) * 100) + "%"
+
+If percentchange > greatest_percent_increase Then
+ greatest_percent_increase = percentchange
+ greatest_increase_ticker = ws.Cells(i, 1).Value
+
+End If
+
+If percentchange < greatest_percent_decrease Then
+ greatest_percent_decrease = percentchange
+ greatest_decrease_ticker = ws.Cells(i, 1).Value
+
+End If
+
+If totalstockvolume > greatest_total_volume Then
+ greatest_total_volume = totalstockvolume
+ greatest_volume_ticker = ws.Cells(i, 1).Value
+
+End If
+
+open_value = ws.Cells(i + 1, 3).Value
+
+
+ws.Cells(count, 12).Value = ticker_total_value
+
+
+count = count + 1
+ticker_total_value = 0
+
+   
+End If
+
+
+
+Next i
+
+ws.Cells(2, 16).Value = greatest_increase_ticker
+ws.Cells(2, 17).Value = Str(greatest_percent_increase) + "%"
+
+ws.Cells(3, 16).Value = greatest_decrease_ticker
+ws.Cells(3, 17).Value = Str(greatest_percent_decrease) + "%"
+
+ws.Cells(4, 16).Value = greatest_volume_ticker
+ws.Cells(4, 17).Value = greatest_total_volume
+
+Next ws
+
+End Sub
